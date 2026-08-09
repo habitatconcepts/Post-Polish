@@ -96,10 +96,6 @@ export const BeforeAfter = () => {
                 className="absolute inset-0 h-full w-full cursor-ew-resize opacity-0"
               />
             </div>
-            <p className="mt-5 text-xs leading-relaxed text-bone/45">
-              Replace these with your own first job photos — real before/afters
-              out-sell any headline on this page.
-            </p>
           </motion.div>
         </div>
       </div>

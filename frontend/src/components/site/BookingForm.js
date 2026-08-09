@@ -133,8 +133,9 @@ export const BookingForm = ({ service, setService }) => {
                           type="button"
                           key={opt}
                           data-testid={`service-option-${opt
-                            .split(" ")[0]
-                            .toLowerCase()}`}
+                            .split(" —")[0]
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}`}
                           onClick={() => setService(opt)}
                           className={`flex w-full items-center justify-between border px-5 py-4 text-left text-sm transition-colors duration-300 ${
                             service === opt
