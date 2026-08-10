@@ -64,6 +64,8 @@ class Lead(BaseDocument):
 
 
 class LeadCreate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
     name: str = Field(min_length=1, max_length=120)
     contact: str = Field(min_length=3, max_length=160)
     address: str = Field(min_length=3, max_length=240)
@@ -172,7 +174,7 @@ async def logout(response: Response):
     return {"ok": True}
 
 
-@api_router.post("/leads", response_model=Lead, status_code=201)
+@api_router.post("/leads", response_model=Lead, response_model_by_alias=False, status_code=201)
 async def create_lead(payload: LeadCreate):
     lead = Lead(**payload.model_dump())
     result = await db.leads.insert_one(lead.to_mongo())
@@ -181,7 +183,7 @@ async def create_lead(payload: LeadCreate):
     return lead
 
 
-@api_router.get("/leads", response_model=List[Lead])
+@api_router.get("/leads", response_model=List[Lead], response_model_by_alias=False)
 async def list_leads(status: Optional[str] = None, admin: AdminOut = Depends(get_current_admin)):
     query = {"status": status} if status else {}
     docs = await db.leads.find(query).sort("created_at", -1).to_list(500)
@@ -205,7 +207,7 @@ async def lead_stats(admin: AdminOut = Depends(get_current_admin)):
             "by_service": by_service}
 
 
-@api_router.patch("/leads/{lead_id}", response_model=Lead)
+@api_router.patch("/leads/{lead_id}", response_model=Lead, response_model_by_alias=False)
 async def update_lead_status(lead_id: str, payload: LeadStatusUpdate,
                              admin: AdminOut = Depends(get_current_admin)):
     if payload.status not in LEAD_STATUSES:
