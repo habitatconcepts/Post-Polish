@@ -114,7 +114,7 @@ export const STEPS = [
     n: "01",
     title: "Pick your package",
     copy:
-      "Standard, Upgraded, or describe a custom project. Clear flat rates — no phone tag.",
+      "The Standard, The Upgrade, or The Landscape. Clear flat rates — no phone tag.",
   },
   {
     n: "02",
@@ -143,7 +143,7 @@ export const FAQS = [
   },
   {
     q: "How long does an installation take?",
-    a: "Most Standard and Upgraded jobs are completed in a single visit, usually inside a couple of hours. Custom projects get a timeline with the quote.",
+    a: "The Standard and The Upgrade are completed in a single visit, usually inside a couple of hours. The Landscape gets its own timeline with the quote.",
   },
   {
     q: "Will my new mailbox meet HOA and postal requirements?",
@@ -154,8 +154,8 @@ export const FAQS = [
     a: "Absolutely. That's our Reset service — we straighten and re-set the post and secure the box, keeping what still works.",
   },
   {
-    q: "What if I'm not sure which package I need?",
-    a: "Describe your current mailbox in the notes field. We'll recommend the right option and confirm the flat rate before anything is scheduled.",
+    q: "What if I'm not sure which tier I need?",
+    a: "Describe your current mailbox in the notes field. We'll recommend The Standard, The Upgrade, or The Landscape and confirm the price before anything is scheduled.",
   },
   {
     q: "Do you only do mailboxes?",

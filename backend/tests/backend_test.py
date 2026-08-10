@@ -62,13 +62,17 @@ def auth_headers(auth_data):
 
 
 @pytest.fixture(scope="session", autouse=True)
-def cleanup_test_leads():
-    yield
+def cleanup_test_data():
     mongo_url = BACKEND_ENV.get("MONGO_URL")
     db_name = BACKEND_ENV.get("DB_NAME")
+    client = None
     if mongo_url and db_name:
         client = MongoClient(mongo_url, serverSelectionTimeoutMS=3000)
+        client[db_name].login_attempts.delete_many({})
+    yield
+    if client is not None:
         client[db_name].leads.delete_many({"name": {"$regex": "^TEST_QA_"}})
+        client[db_name].login_attempts.delete_many({})
         client.close()
 
 
@@ -111,6 +115,14 @@ class TestApi:
         assert "access_token=" in cookie_header and "refresh_token=" in cookie_header
         assert cookie_header.count("httponly") >= 2
         assert cookie_header.count("secure") >= 2
+        assert cookie_header.count("samesite=none") >= 2
+
+        client = MongoClient(BACKEND_ENV["MONGO_URL"], serverSelectionTimeoutMS=3000)
+        remaining_attempts = client[BACKEND_ENV["DB_NAME"]].login_attempts.count_documents(
+            {"identifier": {"$regex": f":{re.escape(email)}$"}}
+        )
+        client.close()
+        assert remaining_attempts == 0, "Successful login did not clear the failed-attempt counter"
 
     def test_05_auth_me_with_bearer(self, api_client, auth_headers, admin_credentials):
         email, _ = admin_credentials
@@ -211,19 +223,39 @@ class TestApi:
         assert user is not None
         assert user["password_hash"].startswith("$2b$")
 
-    def test_14_cors_does_not_allow_arbitrary_origins_with_credentials(self):
-        response = requests.options(
-            f"{API_URL}/auth/login",
-            headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "POST"},
-            timeout=20,
-        )
-        assert response.headers.get("access-control-allow-origin") is None
+    def test_14_cors_explicit_allowlist_for_preflight_and_actual_requests(self):
+        legitimate_origin = "https://post-and-polish.preview.emergentagent.com"
+        evil_origin = "https://evil.example"
 
-    def test_15_brute_force_lockout_after_five_failures(self, admin_credentials):
-        email, _ = admin_credentials
+        for origin, expected_acao in [(legitimate_origin, legitimate_origin), (evil_origin, None)]:
+            preflight = requests.options(
+                f"{API_URL}/auth/login",
+                headers={"Origin": origin, "Access-Control-Request-Method": "POST"},
+                timeout=20,
+            )
+            assert preflight.headers.get("access-control-allow-origin") == expected_acao
+            if expected_acao:
+                assert preflight.headers.get("access-control-allow-credentials") == "true"
+
+            actual = requests.get(f"{API_URL}/", headers={"Origin": origin}, timeout=20)
+            assert actual.status_code == 200
+            assert actual.json() == {"service": "post-and-polish", "status": "ok"}
+            assert actual.headers.get("access-control-allow-origin") == expected_acao
+            if expected_acao:
+                assert actual.headers.get("access-control-allow-credentials") == "true"
+
+    def test_15_brute_force_lockout_after_five_failures(self):
+        probe_email = f"lockout-probe+{RUN_ID}@example.com"
         statuses = []
+        responses = []
         for i in range(6):
-            response = requests.post(f"{API_URL}/auth/login", json={"email": email, "password": f"wrong-{RUN_ID}-{i}"}, timeout=20)
+            response = requests.post(
+                f"{API_URL}/auth/login",
+                json={"email": probe_email, "password": f"wrong-{RUN_ID}-{i}"},
+                timeout=20,
+            )
             statuses.append(response.status_code)
+            responses.append(response)
         assert statuses[:5] == [401] * 5
         assert statuses[5] == 429, f"Expected lockout on sixth attempt, got statuses {statuses}"
+        assert "Too many failed attempts" in responses[5].json().get("detail", "")

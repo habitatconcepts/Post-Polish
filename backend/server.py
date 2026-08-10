@@ -143,12 +143,43 @@ async def root():
     return {"service": "post-and-polish", "status": "ok"}
 
 
+MAX_LOGIN_ATTEMPTS = 5
+LOCKOUT_MINUTES = 15
+
+
+async def check_lockout(identifier: str):
+    record = await db.login_attempts.find_one({"identifier": identifier})
+    if not record:
+        return
+    if record.get("count", 0) < MAX_LOGIN_ATTEMPTS:
+        return
+    last = datetime.fromisoformat(record["last_attempt"])
+    unlock_at = last + timedelta(minutes=LOCKOUT_MINUTES)
+    now = datetime.now(timezone.utc)
+    if now < unlock_at:
+        wait = int((unlock_at - now).total_seconds() / 60) + 1
+        raise HTTPException(status_code=429,
+                            detail=f"Too many failed attempts. Try again in {wait} minute(s).")
+    await db.login_attempts.delete_one({"identifier": identifier})
+
+
 @api_router.post("/auth/login")
-async def login(payload: LoginRequest, response: Response):
+async def login(payload: LoginRequest, request: Request, response: Response):
     email = payload.email.lower().strip()
+    ip = request.client.host if request.client else "unknown"
+    identifier = f"{ip}:{email}"
+    await check_lockout(identifier)
+
     user = await db.users.find_one({"email": email})
     if not user or not verify_password(payload.password, user["password_hash"]):
+        await db.login_attempts.update_one(
+            {"identifier": identifier},
+            {"$inc": {"count": 1},
+             "$set": {"last_attempt": datetime.now(timezone.utc).isoformat()}},
+            upsert=True)
         raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    await db.login_attempts.delete_one({"identifier": identifier})
 
     user_id = str(user["_id"])
     access = create_access_token(user_id, email)
@@ -225,7 +256,7 @@ app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=".*",
+    allow_origins=[o.strip() for o in os.environ["CORS_ORIGINS"].split(",") if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -236,6 +267,7 @@ app.add_middleware(
 async def startup():
     await db.users.create_index("email", unique=True)
     await db.leads.create_index("created_at")
+    await db.login_attempts.create_index("identifier", unique=True)
     admin_email = os.environ["ADMIN_EMAIL"].lower()
     admin_password = os.environ["ADMIN_PASSWORD"]
     existing = await db.users.find_one({"email": admin_email})

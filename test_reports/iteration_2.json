@@ -1,0 +1,50 @@
+{
+  "summary": "Verified both requested fixes and regressions against the public URL. Landing copy, booking, admin dashboard, lead APIs, bcrypt/cookies, and data persistence pass. Public CORS and brute-force behavior still fail despite working correctly when the backend is addressed directly: the edge injects wildcard CORS, and alternating ingress proxy addresses split the per-IP login counter.",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "/api/* (CORS preflight and actual responses)",
+        "issue": "Through the required public URL, both https://evil.example and the legitimate frontend origin receive Access-Control-Allow-Origin: *. The arbitrary origin must receive no ACAO header. Direct backend diagnostics show the FastAPI allowlist is correct, so the public Cloudflare/Google ingress is intercepting preflight and injecting/overriding wildcard CORS headers.",
+        "priority": "HIGH"
+      },
+      {
+        "endpoint": "/api/auth/login",
+        "issue": "Six failed public login attempts for a unique throwaway email returned 401 six times instead of 401 x5 then 429. Backend access logs show requests alternate between ingress source addresses 10.219.1.6 and 10.219.1.32; request.client.host therefore creates separate counters for one caller. A successful public login can likewise leave the counter associated with the other proxy address uncleared. Direct-backend attempts correctly return 429 on attempt six.",
+        "priority": "HIGH"
+      }
+    ],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Configure the public ingress/gateway so it does not inject Access-Control-Allow-Origin: * and allows the backend explicit-origin CORS policy to control preflight and actual responses.",
+    "Make login throttling identify the real client consistently behind trusted proxies (configure trusted forwarded headers/proxy CIDRs), or use a stable account-based key; then verify the sixth public attempt returns 429 and successful login clears all applicable counters.",
+    "Retest both security fixes through REACT_APP_BACKEND_URL rather than localhost."
+  ],
+  "critical_code_review_comments": [
+    "login() keys lockout state with request.client.host, which is an ingress proxy address in this deployment and changes across requests. This makes the lockout bypassable and prevents reliable counter clearing.",
+    "server.py's CORSMiddleware allowlist is correct in direct-backend diagnostics, but the public edge handles OPTIONS itself and adds wildcard CORS to actual responses, so application-only CORS configuration does not enforce the public security boundary.",
+    "/app/auth_testing.md was absent; credentials were read from /app/memory/test_credentials.md as required. Stored admin hash was verified as $2b$, login set two HttpOnly/Secure/SameSite=None cookies, and seed_admin source updates an existing hash when ADMIN_PASSWORD changes."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/iteration_2.json"
+  ],
+  "success_rate": {
+    "backend": "84% (16/19 public endpoint tests passed)",
+    "frontend": "100% of requested desktop flows plus mobile navigation/overflow checks"
+  },
+  "seed_data_creation": "Created one TEST_QA_ backend lead and one TEST_QA_UI_ITER2 booking lead; all TEST_QA_ leads and all login_attempts records were removed after testing (verified zero remaining).",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Keep using the public URL. CORS and brute-force both pass against 127.0.0.1:8001 but fail externally. Backend logs identify alternating ingress peers 10.219.1.6/10.219.1.32. All landing, booking, admin, API validation/status/serialization regressions passed. Use a throwaway lockout email and clear login_attempts after retest.",
+  "rca_of_the_issue": "Public CORS failure is introduced at the Cloudflare/Google ingress: public OPTIONS returns 204 wildcard headers without reaching FastAPI, and wildcard headers are also appended to actual responses. Brute-force failure is caused by using request.client.host behind a load-balanced reverse proxy; one attacker is partitioned into multiple ip:email MongoDB records as proxy source addresses alternate. Configure trusted proxy forwarding or use a stable identifier, and fix edge CORS behavior."
+}
