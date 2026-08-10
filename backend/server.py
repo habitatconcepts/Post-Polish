@@ -166,8 +166,7 @@ async def check_lockout(identifier: str):
 @api_router.post("/auth/login")
 async def login(payload: LoginRequest, request: Request, response: Response):
     email = payload.email.lower().strip()
-    ip = request.client.host if request.client else "unknown"
-    identifier = f"{ip}:{email}"
+    identifier = f"acct:{email}"
     await check_lockout(identifier)
 
     user = await db.users.find_one({"email": email})

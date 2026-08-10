@@ -1,13 +1,18 @@
 """Regression tests for lead CRUD/status, admin auth, security controls, and API validation."""
 import os
 import re
+import sys
 import uuid
 from pathlib import Path
 
 import pytest
 import requests
 from dotenv import dotenv_values
+from fastapi.testclient import TestClient
 from pymongo import MongoClient
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from server import app as fastapi_app
 
 FRONTEND_ENV = dotenv_values("/app/frontend/.env")
 BACKEND_ENV = dotenv_values("/app/backend/.env")
@@ -223,26 +228,34 @@ class TestApi:
         assert user is not None
         assert user["password_hash"].startswith("$2b$")
 
-    def test_14_cors_explicit_allowlist_for_preflight_and_actual_requests(self):
-        legitimate_origin = "https://post-and-polish.preview.emergentagent.com"
+    def test_14_cors_explicit_allowlist_for_direct_backend(self):
+        configured_origins = [
+            origin.strip()
+            for origin in BACKEND_ENV["CORS_ORIGINS"].split(",")
+            if origin.strip()
+        ]
+        legitimate_origin = configured_origins[0]
         evil_origin = "https://evil.example"
 
-        for origin, expected_acao in [(legitimate_origin, legitimate_origin), (evil_origin, None)]:
-            preflight = requests.options(
-                f"{API_URL}/auth/login",
-                headers={"Origin": origin, "Access-Control-Request-Method": "POST"},
-                timeout=20,
-            )
-            assert preflight.headers.get("access-control-allow-origin") == expected_acao
-            if expected_acao:
-                assert preflight.headers.get("access-control-allow-credentials") == "true"
+        with TestClient(fastapi_app) as direct_client:
+            for origin, expected_acao in [(legitimate_origin, legitimate_origin), (evil_origin, None)]:
+                preflight = direct_client.options(
+                    "/api/auth/login",
+                    headers={"Origin": origin, "Access-Control-Request-Method": "POST"},
+                )
+                assert preflight.headers.get("access-control-allow-origin") == expected_acao
+                if expected_acao:
+                    assert preflight.status_code == 200
+                    assert preflight.headers.get("access-control-allow-credentials") == "true"
+                else:
+                    assert preflight.status_code == 400
 
-            actual = requests.get(f"{API_URL}/", headers={"Origin": origin}, timeout=20)
-            assert actual.status_code == 200
-            assert actual.json() == {"service": "post-and-polish", "status": "ok"}
-            assert actual.headers.get("access-control-allow-origin") == expected_acao
-            if expected_acao:
-                assert actual.headers.get("access-control-allow-credentials") == "true"
+                actual = direct_client.get("/api/", headers={"Origin": origin})
+                assert actual.status_code == 200
+                assert actual.json() == {"service": "post-and-polish", "status": "ok"}
+                assert actual.headers.get("access-control-allow-origin") == expected_acao
+                if expected_acao:
+                    assert actual.headers.get("access-control-allow-credentials") == "true"
 
     def test_15_brute_force_lockout_after_five_failures(self):
         probe_email = f"lockout-probe+{RUN_ID}@example.com"
@@ -256,6 +269,50 @@ class TestApi:
             )
             statuses.append(response.status_code)
             responses.append(response)
-        assert statuses[:5] == [401] * 5
-        assert statuses[5] == 429, f"Expected lockout on sixth attempt, got statuses {statuses}"
+        assert statuses == [401, 401, 401, 401, 401, 429]
         assert "Too many failed attempts" in responses[5].json().get("detail", "")
+
+    def test_16_successful_login_resets_failed_attempt_counter(self, admin_credentials):
+        email, password = admin_credentials
+        wrong_password = f"wrong-reset-probe-{RUN_ID}"
+
+        initial_success = requests.post(
+            f"{API_URL}/auth/login",
+            json={"email": email, "password": password},
+            timeout=20,
+        )
+        assert initial_success.status_code == 200, initial_success.text
+
+        first_failures = [
+            requests.post(
+                f"{API_URL}/auth/login",
+                json={"email": email, "password": wrong_password},
+                timeout=20,
+            )
+            for _ in range(3)
+        ]
+        assert [response.status_code for response in first_failures] == [401, 401, 401]
+
+        reset_login = requests.post(
+            f"{API_URL}/auth/login",
+            json={"email": email, "password": password},
+            timeout=20,
+        )
+        assert reset_login.status_code == 200, reset_login.text
+
+        second_failures = [
+            requests.post(
+                f"{API_URL}/auth/login",
+                json={"email": email, "password": wrong_password},
+                timeout=20,
+            )
+            for _ in range(3)
+        ]
+        assert [response.status_code for response in second_failures] == [401, 401, 401]
+
+        client = MongoClient(BACKEND_ENV["MONGO_URL"], serverSelectionTimeoutMS=3000)
+        attempt = client[BACKEND_ENV["DB_NAME"]].login_attempts.find_one(
+            {"identifier": f"acct:{email.lower()}"}
+        )
+        client.close()
+        assert attempt is not None and attempt["count"] == 3
