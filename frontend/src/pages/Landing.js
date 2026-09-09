@@ -6,6 +6,7 @@ import { TrustRibbon } from "@/components/site/TrustRibbon";
 import { FiveRs } from "@/components/site/FiveRs";
 import { Packages } from "@/components/site/Packages";
 import { BeforeAfter } from "@/components/site/BeforeAfter";
+import { Ritual } from "@/components/site/Ritual";
 import { HowItWorks } from "@/components/site/HowItWorks";
 import { FAQ } from "@/components/site/FAQ";
 import { BookingForm } from "@/components/site/BookingForm";
@@ -44,6 +45,7 @@ export default function Landing() {
       <FiveRs />
       <Packages onSelect={pick} />
       <BeforeAfter />
+      <Ritual />
       <HowItWorks onSelect={pick} />
       <FAQ />
       <BookingForm service={service} setService={setService} />

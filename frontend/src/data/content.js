@@ -48,62 +48,86 @@ export const SERVICES = [
 
 export const PACKAGES = [
   {
-    id: "standard",
-    name: "The Standard",
-    tagline: "Fix the eyesore, cleanly and quickly.",
-    price: "$299",
+    id: "essential",
+    name: "The Essential",
+    tagline: "Done properly, done quickly.",
+    price: "$349",
     priceNote: "flat · all-inclusive · one visit",
     featured: false,
     features: [
-      "Durable post & classic box",
-      "Removal & haul-away of old unit",
-      "Clean, level, code-compliant set",
-      "Basic house numbers",
+      "Quality retail wood or vinyl post",
+      "Professional, code-compliant install",
+      "Old post removal & haul-away",
+      "Set plumb and level to postal height",
       "Full site cleanup",
     ],
-    cta: "Book Standard",
-    serviceValue: "The Standard — replacement",
+    cta: "Book The Essential",
+    serviceValue: "The Essential — code-compliant install",
   },
   {
-    id: "upgraded",
-    name: "The Upgrade",
-    tagline: "Noticeably elevate your curb appeal.",
+    id: "designer",
+    name: "The Designer Series",
+    tagline: "Where the craftsman finish shows.",
     price: "$699",
     priceNote: "flat · all-inclusive · one visit",
     featured: true,
     features: [
-      "Premium timber or architectural post",
-      "Decorative or upgraded box",
-      "Custom metal brackets & hardware",
-      "Professional vinyl number decals",
-      "Removal, haul-away & cleanup",
+      "Hand-sanded to a 220-grit finish",
+      "Rounded, eased edges throughout",
+      "Premium paint or stain, fully sealed",
+      "Integrated solar safety lighting",
+      "Premium hardware & house numbers",
     ],
-    cta: "Book The Upgrade",
-    serviceValue: "The Upgrade — premium curb appeal",
+    cta: "Book The Designer Series",
+    serviceValue: "The Designer Series — craftsman finish",
   },
   {
-    id: "landscape",
-    name: "The Landscape",
-    tagline: "The whole curbside, designed as one.",
-    price: "From $1,499",
-    priceNote: "call for a firm quote",
+    id: "signature",
+    name: "The Signature Series",
+    tagline: "Architectural builds, one of a kind.",
+    price: "Quote by project",
+    priceNote: "firm price before work begins",
     featured: false,
     features: [
-      "Premium post & architectural box",
-      "Designed planting bed & edging",
-      "Stone or masonry-adjacent base",
-      "Low-voltage or solar lighting",
-      "Mulch, cleanup & finish detailing",
+      "Fully architectural custom builds",
+      "Charred Shou Sugi Ban finishes",
+      "Commercial & business builds",
+      "Auto shops, real estate offices, themed displays",
+      "Design consultation included",
     ],
-    cta: "Call for a Quote",
-    serviceValue: "The Landscape — full curbside design",
+    cta: "Request a Custom Quote",
+    serviceValue: "The Signature Series — custom / commercial build",
+  },
+];
+
+export const MATERIAL_NOTE =
+  "We install wood, vinyl, and decorative metal — matched to your home's siding, fencing, or HOA requirements so the post looks like it was always meant to be there.";
+
+export const RITUAL = [
+  {
+    icon: "ShieldCheck",
+    title: "Professional Prep",
+    copy:
+      "We handle the 811 utility checks and the removal of your old post before a single hole is dug.",
+  },
+  {
+    icon: "Hand",
+    title: "Craftsman Finish",
+    copy:
+      "Hand-sanded, leveled to perfection, and wiped to a shine — the details you only notice up close.",
+  },
+  {
+    icon: "Stamp",
+    title: "The P&P Stamp",
+    copy:
+      "We leave a professional yard stake and a worksite cleaner than we found it. Every time.",
   },
 ];
 
 export const SERVICE_OPTIONS = [
-  "The Standard — replacement",
-  "The Upgrade — premium curb appeal",
-  "The Landscape — full curbside design",
+  "The Essential — code-compliant install",
+  "The Designer Series — craftsman finish",
+  "The Signature Series — custom / commercial build",
   "Reset — straighten a leaning post",
   "Refresh — paint, numbers & hardware",
   "Recover — storm / vehicle damage (priority)",
@@ -112,9 +136,9 @@ export const SERVICE_OPTIONS = [
 export const STEPS = [
   {
     n: "01",
-    title: "Pick your package",
+    title: "Pick your tier",
     copy:
-      "The Standard, The Upgrade, or The Landscape. Clear flat rates — no phone tag.",
+      "The Essential, The Designer Series, or a Signature build. Clear flat rates — no phone tag.",
   },
   {
     n: "02",
@@ -143,11 +167,11 @@ export const FAQS = [
   },
   {
     q: "How long does an installation take?",
-    a: "The Standard and The Upgrade are completed in a single visit, usually inside a couple of hours. The Landscape gets its own timeline with the quote.",
+    a: "The Essential and The Designer Series are completed in a single visit, usually inside a couple of hours. Signature Series builds get their own timeline with the quote.",
   },
   {
     q: "Will my new mailbox meet HOA and postal requirements?",
-    a: "Every install is set to postal height and placement guidelines, and we're happy to match specific HOA style requirements — just mention them when you book.",
+    a: "Every install is set to postal height and placement guidelines. We also install wood, vinyl, and decorative metal matched to your siding, fencing, or specific HOA style requirements — just mention them when you book.",
   },
   {
     q: "Can you just fix my leaning post without replacing everything?",
@@ -155,11 +179,11 @@ export const FAQS = [
   },
   {
     q: "What if I'm not sure which tier I need?",
-    a: "Describe your current mailbox in the notes field. We'll recommend The Standard, The Upgrade, or The Landscape and confirm the price before anything is scheduled.",
+    a: "Describe your current mailbox in the notes field. We'll recommend The Essential, The Designer Series, or a Signature build and confirm the price before anything is scheduled.",
   },
   {
-    q: "Do you only do mailboxes?",
-    a: "That's the point. No gutters, no fences, no odd jobs. One specialty means yours gets done right the first time.",
+    q: "Do you build for businesses too?",
+    a: "Yes — Signature Series covers commercial and business builds: auto shops, real estate offices, and themed displays. Request a custom quote and we'll design to your branding.",
   },
 ];
 

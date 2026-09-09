@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
-import { PACKAGES } from "@/data/content";
+import { Check, Hammer, ArrowRight } from "lucide-react";
+import { PACKAGES, MATERIAL_NOTE } from "@/data/content";
 
 export const Packages = ({ onSelect }) => (
   <section
@@ -111,10 +111,49 @@ export const Packages = ({ onSelect }) => (
         ))}
       </div>
 
-      <p className="mt-14 max-w-3xl border-l-2 border-brass pl-6 font-serif text-xl italic leading-snug text-slate950/75 lg:text-2xl">
-        Got a unique layout or a specific HOA requirement? Let's build it. Every
-        quote is firm before we touch a shovel.
-      </p>
+      <div
+        data-testid="material-matching-note"
+        className="mt-14 flex flex-col gap-6 border border-slate950/15 bg-bone p-8 lg:flex-row lg:items-center lg:p-10"
+      >
+        <Hammer size={22} strokeWidth={1.4} className="shrink-0 text-brass" />
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-brass">
+            Material matching
+          </p>
+          <p className="mt-3 max-w-3xl text-sm leading-relaxed text-slate950/70 md:text-base">
+            {MATERIAL_NOTE}
+          </p>
+        </div>
+      </div>
+
+      <div
+        data-testid="signature-cta-band"
+        className="mt-6 flex flex-col items-start justify-between gap-8 border border-brass bg-slate950 p-9 lg:flex-row lg:items-center lg:p-12"
+      >
+        <div className="max-w-2xl">
+          <p className="overline">Signature Series &amp; commercial</p>
+          <h3 className="mt-4 font-serif text-3xl text-bone lg:text-4xl">
+            Something one of a kind?
+          </h3>
+          <p className="mt-3 text-sm leading-relaxed text-bone/65 md:text-base">
+            Architectural builds, charred Shou Sugi Ban finishes, auto shops,
+            real estate offices, and themed displays. Every quote is firm before
+            we touch a shovel.
+          </p>
+        </div>
+        <button
+          type="button"
+          data-testid="signature-custom-quote-cta"
+          onClick={() => onSelect(PACKAGES[2].serviceValue)}
+          className="group inline-flex shrink-0 items-center gap-3 bg-brass px-8 py-4 text-xs font-bold uppercase tracking-[0.18em] text-slate950 transition-transform duration-300 hover:-translate-y-0.5"
+        >
+          Request a Custom Quote
+          <ArrowRight
+            size={16}
+            className="transition-transform duration-300 group-hover:translate-x-1"
+          />
+        </button>
+      </div>
     </div>
   </section>
 );
