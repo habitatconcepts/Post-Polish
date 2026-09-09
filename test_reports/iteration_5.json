@@ -1,0 +1,28 @@
+{
+  "summary": "iteration_5 (frontend/asset-only iteration: new NE Post & Polish raster logo applied to nav, footer, and favicon). Backend regression suite 20/20 green (unchanged). Frontend asset & UI checks all pass: (1) document.title is exactly 'NE Post & Polish | Mailbox Specialists'; (2) <head> declares <link rel=icon href=/favicon.ico>, <link rel=icon type=image/png href=/logo-icon.png>, <link rel=apple-touch-icon href=/apple-touch-icon.png>, meta description contains 'NE Post & Polish'; (3) direct HTTP fetch of /favicon.ico (200, 11033B), /logo-icon.png (200, 62399B), /apple-touch-icon.png (200, 30670B), /logo-primary.png (200, 268030B) — no 404s, correct content-types; (4) Nav renders <img data-testid=nav-logo-image src=/logo-primary.png> inside data-testid=nav-logo, naturalWidth=760, loads over both the transparent dark hero and after scroll on the cream/bone backdrop, clicking scrolls window.scrollY back to 0; (5) Footer renders <img data-testid=footer-logo-image src=/logo-primary.png> with naturalWidth=760 inside data-testid=site-footer; footer copyright reads '© 2026 NE Post & Polish' (CSS-uppercased for display); (6) Old text lockup ('Post', '&', 'Polish' spans) is gone from both nav-logo and footer — inner_text of nav-logo is empty (image only); (7) Mobile 390x844 viewport: nav logo box (x=24, w=110.9) does not overlap mobile toggle (x=344), toggle opens data-testid=nav-mobile-panel with all 6 links + Get a quote CTA rendering cleanly, nav-logo click returns to top; no horizontal overflow observed; (8) no console errors during load. Logo is legible at both desktop and mobile — eggshell enamel-plate badge with maroon serif 'NE Post & Polish' wordmark, navy brush stroke, wood-grain post with Fire Pit brown cap all rendering as designed. Booking + admin regression skipped this iteration because no code path changed vs iteration_4 (which was fully green); backend suite still exercises the full lead CRUD + auth + brute-force flow end-to-end.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "backend/server.py still uses deprecated @app.on_event('startup'/'shutdown') — should migrate to FastAPI lifespan handlers (deprecation warnings only, non-blocking).",
+    "Landing.js/BookingForm.js service-option data-testids derived from option text via split(' —')[0].toLowerCase() are fragile — consider stable keys on SERVICE_OPTIONS entries (carried over from iteration_4).",
+    "Logo.js: img has no explicit width/height attributes — could cause minor CLS on slow connections. Consider adding intrinsic dimensions (natural 760x329) or a fixed aspect-ratio wrapper.",
+    "Legacy 'Diag Test' leads with retired 'The Standard — replacement' service label still persist in MongoDB from earlier iterations — visible in admin dashboard; recommend one-time cleanup or reseed."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (20/20)", "frontend": "100% (all new-logo asset + nav/footer/mobile checks verified)"},
+  "test_credentials": "admin@postandpolish.com / Polish2026! (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "None. Post-test cleanup ran: 0 TEST_QA_ leads and 0 login_attempts removed (already clean).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "iteration_5 fully green. New logo assets (logo-primary.png, logo-icon.png, apple-touch-icon.png, favicon.ico) live in /app/frontend/public and are served 200 via the preview edge. Nav/Footer now use <Logo/> component (src /logo-primary.png); text lockup removed. Backend untouched since iteration_3. Legacy 'Diag Test' seed leads still visible in admin.",
+  "rca of the issue": "N/A — no failures."
+}

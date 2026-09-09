@@ -43,8 +43,11 @@ clear flat-rate tiers and low-friction booking.
 - Booking: `POST /api/leads` (public) persists to MongoDB; tier/CTA clicks preselect the service.
 - Admin: `/admin/login` + `/admin` dashboard — stat cards, lead table, status pipeline
   (new/contacted/scheduled/completed/lost), status filters, refresh, logout.
-- Six logo concepts generated; NOT yet wired in — nav/footer still use the text lockup.
-- AI-generated placeholder hero and before/after photography.
+- **Definitive NE Post & Polish logo** (eggshell enamel plate with burnt patina edges, maroon embossed
+  serif wordmark, saturated navy hand-painted brush stroke, semi-transparent wood-grain post with a
+  Fire Pit brown cap) applied to nav, footer, favicon, apple-touch-icon; page title and meta updated.
+  Assets: `/app/frontend/public/logo-primary.png`, `logo-icon.png`, `apple-touch-icon.png`, `favicon.ico`.
+  Raster only — an SVG rebuild is still open if large-format print is needed.- AI-generated placeholder hero and before/after photography.
 - Tested: iteration_4 green — 20/20 backend, all requested frontend flows.
 
 ## Backlog

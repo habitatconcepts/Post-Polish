@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { Logo } from "@/components/site/Logo";
 
 const LINKS = [
   { label: "Services", href: "#services" },
@@ -34,25 +35,12 @@ export const Nav = () => {
         <a
           href="#top"
           data-testid="nav-logo"
-          className="group flex items-baseline gap-2"
+          className="group flex items-center"
         >
-          <span
-            className={`font-serif text-2xl leading-none ${
-              scrolled ? "text-slate950" : "text-white"
-            }`}
-          >
-            Post
-          </span>
-          <span className="text-brass font-serif text-2xl italic leading-none">
-            &amp;
-          </span>
-          <span
-            className={`font-serif text-2xl leading-none ${
-              scrolled ? "text-slate950" : "text-white"
-            }`}
-          >
-            Polish
-          </span>
+          <Logo
+            className="h-12 transition-transform duration-500 group-hover:scale-[1.03] lg:h-16"
+            testId="nav-logo-image"
+          />
         </a>
 
         <nav className="hidden items-center gap-10 md:flex">
