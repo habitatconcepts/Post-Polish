@@ -62,7 +62,12 @@ clear flat-rate tiers and low-friction booking.
   workshop + tools-of-the-trade, integrity-driven-builds copy), **Process** photo cards
   (stock selection / hardware / 220-grit finish). Slow editorial marquee replaces the trust ribbon.
 - Lenis momentum scrolling; framer-motion reveals and micro-interactions throughout.
-- All photography is AI-generated stand-in in named `SHOTS` slots — real photos never arrived.
+- All photography is the client's own work: 5 real project photos wired via `SHOTS` in content.js
+  (three-post row with flowers, solar caps/finials close-up, charred Shou Sugi Ban timber, Mustang
+  display build, driveway bracket assembly). All AI stand-in imagery and the before/after slider
+  section were removed (BeforeAfter.js and the IMAGES export deleted).
+- Hero is a two-column layout (copy left, right-edge framed parallax portrait panel) because the real
+  hero photo is portrait; mobile falls back to a full-bleed background.
 - Lead alert emails: Resend + FastAPI BackgroundTasks (`send_lead_alert`), safe no-op until
   `RESEND_API_KEY` + `LEAD_ALERT_EMAIL` are set.
 - Tested: iteration_6 green — 20/20 backend, all new sections, 0 broken images, 0 console errors.
@@ -82,10 +87,8 @@ clear flat-rate tiers and low-friction booking.
 - SEO: local business schema, per-service landing pages.
 
 ## Next tasks
-1. **Blocked — awaiting user upload**: swap real project photos into the named `SHOTS` slots in
-   `/app/frontend/src/data/content.js` (rowThreePosts, shouBridge, carDisplay, driveway, tools,
-   rawCuts, hardware, sanding, grain, blackPost). All current photography is AI-generated stand-in.
-2. **Blocked — awaiting user key**: lead alert emails. Code path is live via Resend + BackgroundTasks
+1. **Blocked — awaiting user key**: lead alert emails. Code path is live via Resend + BackgroundTasks
    but no-ops until `RESEND_API_KEY` and `LEAD_ALERT_EMAIL` are set in `/app/backend/.env`.
-3. Swap the before/after slider images for a real single-property before and after.
+2. Need a real before/after pair (same property) to bring back a proof slider.
+3. More real photos would let each section have unique imagery (currently 5 photos repeat).
 4. Add booking-form photo upload (object storage) for photo-based quoting.

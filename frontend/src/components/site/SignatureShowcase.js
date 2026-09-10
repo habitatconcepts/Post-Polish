@@ -45,7 +45,7 @@ export const SignatureShowcase = ({ onSelect }) => {
           >
             <img
               src={SHOTS.shouBridge}
-              alt="Charred Shou Sugi Ban heritage bridge mailbox structure under a raking spotlight"
+              alt="Charred Shou Sugi Ban timber components stacked in the driveway shop"
               className="aspect-[3/4] w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#070E1A] via-transparent to-transparent opacity-80" />
@@ -54,10 +54,10 @@ export const SignatureShowcase = ({ onSelect }) => {
                 Shou Sugi Ban
               </p>
               <h3 className="mt-3 font-serif text-2xl text-bone lg:text-3xl">
-                The Heritage bridge
+                Charred by hand
               </h3>
               <p className="mt-2 text-sm text-bone/60">
-                Timber charred, brushed, and sealed — weatherproof by fire.
+                Timber torched, brushed, and sealed — weatherproof by fire.
               </p>
             </figcaption>
           </motion.figure>
@@ -68,7 +68,7 @@ export const SignatureShowcase = ({ onSelect }) => {
           >
             <img
               src={SHOTS.carDisplay}
-              alt="Bespoke themed mailbox display assembly built for a classic car enthusiast"
+              alt="Bespoke Mustang display assembly mounted on a charred timber post"
               className="aspect-[4/3] w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.04] lg:aspect-[16/13]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#070E1A] via-transparent to-transparent opacity-80" />
@@ -77,7 +77,7 @@ export const SignatureShowcase = ({ onSelect }) => {
                 Commercial &amp; themed
               </p>
               <h3 className="mt-3 font-serif text-2xl text-bone lg:text-4xl">
-                The muscle car display
+                The Mustang display
               </h3>
               <p className="mt-2 max-w-md text-sm text-bone/60">
                 Fabricated brackets, steel silhouette, plate detail — a

@@ -1,0 +1,25 @@
+{
+  "summary": "Iteration 7 — real-photo swap + hero restructure + BeforeAfter removal verified end-to-end. Backend: 20/20 pytest cases pass. Frontend: all 16 <img> tags on the landing page load (naturalWidth=1500) and every one is served from customer-assets-jai6qajn.emergentagent.net; zero images from static.prod-images.emergentagent.com (AI stand-ins). No CSS background images on the page. proof-section and before-after-range are gone. New hero renders two-column at 1920/1440/1280 with figure occupying ~40vw on the right — measured h1 vs figure bounding boxes and confirmed NO x-axis intersection at any of the three desktop widths. At 390x844 the hero figure is display:none and no horizontal overflow is present. All required data-testids render: hero-section, gallery-section, gallery-item-0..4, signature-showcase, signature-showcase-cta, handcrafted-section, process-section, process-shot-0/1/2, process-step-01..04, recover-cta, material-matching-note, signature-cta-band, signature-custom-quote-cta, manifesto-section, manifesto-chapter-01..04, ritual-section, trust-ribbon, nav-logo-image, footer-logo-image. Nav links Services/Pricing/Gallery/Signature/Craft/Process/FAQ all resolve to existing anchors. Booking regression: empty submit blocked with error toast; full submit -> booking-success. Admin regression: /admin redirects to /admin/login unauth; login with admin@postandpolish.com/Polish2026! loads dashboard; TEST_QA_Frontend Lead visible; admin-logout returns to login. Zero JS console errors on landing page.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Hero (desktop >= 1280)", "issues": ["The right-edge figure panel (40vw) sits behind/underneath the top navigation. At 1920 the figure starts at x=1152 while the 'GET A QUOTE' CTA sits at ~x=1194; at 1440 the figure starts at x=864 and the SIGNATURE/CRAFT/PROCESS/FAQ/GET A QUOTE links visually overlap the darker top portion of the photo. Nav links remain legible because the image is dark in that region, but this is borderline. Consider adding a subtle top-of-figure gradient or reducing figure to top:80px so it never sits under the nav bar."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "content.js still exports IMAGES with 4 static.prod-images.emergentagent.com URLs (hero/before/after/upgraded). It's only imported by BeforeAfter.js which is no longer mounted on the Landing page, so users never see AI images. Still worth deleting the IMAGES export and the BeforeAfter.js file to remove dead code (test grep confirms zero other consumers).",
+    "server.py still uses deprecated @app.on_event startup/shutdown — migrate to lifespan handler (carry-over from iter 6)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "admin@postandpolish.com / Polish2026!",
+  "seed_data_creation": "One TEST_QA_Frontend Lead created during booking regression; deleted post-run along with login_attempts collection.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 5 real customer-asset photos are correctly wired via SHOTS in /app/frontend/src/data/content.js and repeated across sections by design (only 5 photos exist). Hero has NO x-axis overlap between the headline column and the right-edge figure at 1920/1440/1280, and the mobile fallback correctly hides the figure. Dead code: /app/frontend/src/components/site/BeforeAfter.js + the IMAGES export in content.js can be safely deleted. Backend tests are stable at 20/20. Two 401 console entries on /admin unauth redirect are expected (auth/me probe) and only visible on the admin route, not on the landing page.",
+  "rca of the issue": "N/A"
+}

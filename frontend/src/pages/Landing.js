@@ -9,8 +9,8 @@ import { Packages } from "@/components/site/Packages";
 import { Gallery } from "@/components/site/Gallery";
 import { SignatureShowcase } from "@/components/site/SignatureShowcase";
 import { HandCrafted } from "@/components/site/HandCrafted";
-import { BeforeAfter } from "@/components/site/BeforeAfter";
 import { Ritual } from "@/components/site/Ritual";
+
 import { HowItWorks } from "@/components/site/HowItWorks";
 import { FAQ } from "@/components/site/FAQ";
 import { BookingForm } from "@/components/site/BookingForm";
@@ -52,7 +52,6 @@ export default function Landing() {
       <Gallery />
       <SignatureShowcase onSelect={pick} />
       <HandCrafted />
-      <BeforeAfter />
       <Ritual />
       <HowItWorks onSelect={pick} />
       <FAQ />

@@ -39,7 +39,7 @@ export const Gallery = () => (
               alt={g.title}
               className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate950/85 via-slate950/10 to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-95" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate950 via-slate950/45 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
             <figcaption className="absolute inset-x-0 bottom-0 translate-y-2 p-6 transition-transform duration-500 group-hover:translate-y-0 lg:p-8">
               <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-brass">
                 {g.meta}

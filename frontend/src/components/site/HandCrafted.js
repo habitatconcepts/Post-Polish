@@ -52,12 +52,12 @@ export const HandCrafted = () => {
 
             <figure className="mt-14 overflow-hidden border border-slate950/12">
               <img
-                src={SHOTS.tools}
-                alt="Overhead tray of a craftsman's tools: level, square, chisel, sanding block, 220-grit paper and black hardware"
+                src={SHOTS.designerCaps}
+                alt="Close-up of three finished posts with carved finials and black solar caps"
                 className="aspect-[4/3] w-full object-cover"
               />
               <figcaption className="bg-bone px-6 py-4 text-[11px] uppercase tracking-[0.18em] text-slate950/45">
-                Tools of the trade — laid out before the first cut
+                Carved finials, solar caps, hand-painted finishes
               </figcaption>
             </figure>
           </div>
@@ -67,7 +67,7 @@ export const HandCrafted = () => {
               <motion.img
                 style={{ y }}
                 src={SHOTS.driveway}
-                alt="Driveway workshop: a cedar post on sawhorses mid-build with clamps, drill and offcuts"
+                alt="Charred timber bracket assembly clamped on stands in the driveway shop"
                 className="h-[520px] w-full object-cover will-change-transform lg:h-[760px]"
               />
             </div>
