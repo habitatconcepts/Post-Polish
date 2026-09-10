@@ -62,10 +62,12 @@ clear flat-rate tiers and low-friction booking.
   workshop + tools-of-the-trade, integrity-driven-builds copy), **Process** photo cards
   (stock selection / hardware / 220-grit finish). Slow editorial marquee replaces the trust ribbon.
 - Lenis momentum scrolling; framer-motion reveals and micro-interactions throughout.
-- All photography is the client's own work: 5 real project photos wired via `SHOTS` in content.js
-  (three-post row with flowers, solar caps/finials close-up, charred Shou Sugi Ban timber, Mustang
-  display build, driveway bracket assembly). All AI stand-in imagery and the before/after slider
-  section were removed (BeforeAfter.js and the IMAGES export deleted).
+- All photography is the client's own work: 10 real project photos wired via `SHOTS` in content.js
+  (three-post row with flowers, solar caps/finials close-up, charred Shou Sugi Ban timber stack,
+  Mustang display build, driveway bracket assembly, charred arbour frame, raw bevelled blanks,
+  tool tray, prepped mailboxes, stain can). Each section shows a different shot. No AI imagery.
+- **Proof slider** (`ProofSlider.js`): honest raw-stock → charred-and-assembled transformation
+  ("The same timber, forty hours apart") — the client has no true curbside before/after pair yet.
 - Hero is a two-column layout (copy left, right-edge framed parallax portrait panel) because the real
   hero photo is portrait; mobile falls back to a full-bleed background.
 - Lead alert emails: Resend + FastAPI BackgroundTasks (`send_lead_alert`), safe no-op until
@@ -89,6 +91,7 @@ clear flat-rate tiers and low-friction booking.
 ## Next tasks
 1. **Blocked — awaiting user key**: lead alert emails. Code path is live via Resend + BackgroundTasks
    but no-ops until `RESEND_API_KEY` and `LEAD_ALERT_EMAIL` are set in `/app/backend/.env`.
-2. Need a real before/after pair (same property) to bring back a proof slider.
-3. More real photos would let each section have unique imagery (currently 5 photos repeat).
+2. A true curbside before/after pair (same property, old post then new) would let the proof slider
+   sell the customer outcome rather than the material transformation.
+3. More installed-at-the-curb photos — most current shots are bench/workshop stage.
 4. Add booking-form photo upload (object storage) for photo-based quoting.

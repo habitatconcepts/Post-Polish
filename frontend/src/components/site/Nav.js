@@ -7,7 +7,7 @@ const LINKS = [
   { label: "Pricing", href: "#pricing" },
   { label: "Gallery", href: "#gallery" },
   { label: "Signature", href: "#signature" },
-  { label: "Craft", href: "#craft" },
+  { label: "Proof", href: "#proof" },
   { label: "Process", href: "#process" },
   { label: "FAQ", href: "#faq" },
 ];

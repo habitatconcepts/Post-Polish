@@ -48,7 +48,7 @@ export const FiveRs = () => (
             >
               {isFirst && (
                 <img
-                  src={SHOTS.blackPost}
+                  src={SHOTS.designerCaps}
                   alt=""
                   className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25 transition-transform duration-[1200ms] group-hover:scale-105"
                 />

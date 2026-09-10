@@ -39,7 +39,7 @@ export const HowItWorks = ({ onSelect }) => (
               <img
                 src={SHOTS[p.src]}
                 alt={p.label}
-                className="aspect-[4/3] w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
+                className="aspect-[4/3] w-full object-cover object-[50%_35%] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
               />
             </div>
             <figcaption className="p-7 lg:p-8">

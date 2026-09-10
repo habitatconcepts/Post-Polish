@@ -46,7 +46,7 @@ export const Hero = () => {
           alt="Three finished Designer Series posts in black, barn red and white behind a flower basket"
           className="h-full w-full object-cover object-[50%_28%]"
         />
-        <div className="absolute inset-0 bg-slate950/72" />
+        <div className="absolute inset-0 bg-slate950/82" />
       </div>
 
       {/* desktop: clipped portrait frame, bleeds to the right edge */}

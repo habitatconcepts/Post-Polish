@@ -21,8 +21,8 @@ export const Manifesto = () => (
             </h2>
             <div className="mt-12 hidden overflow-hidden border border-stone lg:block">
               <motion.img
-                src={SHOTS.grain}
-                alt="Macro detail of hand-rubbed wood grain with an eased edge"
+                src={SHOTS.stain}
+                alt="A can of semi-transparent stain and sealer with a finishing cloth on the bench"
                 initial={{ scale: 1.12, opacity: 0 }}
                 whileInView={{ scale: 1, opacity: 1 }}
                 viewport={{ once: true }}

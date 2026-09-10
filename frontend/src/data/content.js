@@ -7,10 +7,17 @@ export const SHOTS = {
   shouBridge: `${A}/kvmm9zbq_att.F0SAbgqOmAHhUKHQO_lkQgM9ULCWvhUAyn1JoEHldMA.webp`,
   carDisplay: `${A}/eqxpw3ap_IMG_8244.webp`,
   driveway: `${A}/f68jat7t_IMG_7992.webp`,
+  charredFrame: `${A}/r7m28e7g_att.vz-lcwyac8IQ-NdyT0J21vd-d9l90uaRIgmUPcbd8zk%202.webp`,
+  rawCuts: `${A}/qjiebp2m_att.V4OKmTIaRQiCiTVfaJ4DTCQ1x-wTyNlt7-ekFIlYJGI.webp`,
+  tools: `${A}/9nfthltb_IMG_6237%202.webp`,
+  boxesPrep: `${A}/z4oc1vkf_IMG_6539.webp`,
+  stain: `${A}/6nvg79qo_IMG_7983.webp`,
 };
-SHOTS.blackPost = SHOTS.designerCaps;
-SHOTS.grain = SHOTS.designerCaps;
-SHOTS.rawCuts = SHOTS.shouBridge;
+
+export const PROOF = {
+  before: { src: "rawCuts", label: "Raw stock", caption: "Rough timber, cut and bevelled on the sawhorses." },
+  after: { src: "charredFrame", label: "Charred & assembled", caption: "Torched, brushed, braced and squared — ready to set." },
+};
 
 export const MANIFESTO = [
   {
@@ -56,10 +63,10 @@ export const CRAFT_COPY = {
 
 export const PROCESS_SHOTS = [
   {
-    src: "shouBridge",
-    label: "Stock & charring",
+    src: "rawCuts",
+    label: "Stock & cuts",
     copy:
-      "Timber picked by hand, cut square, and torched or stained before a single bracket goes on.",
+      "Timber picked by hand, cut square, and bevelled on the sawhorses before anything is fastened.",
   },
   {
     src: "driveway",
@@ -68,19 +75,20 @@ export const PROCESS_SHOTS = [
       "Arms and braces clamped, squared, and fastened on stands — every joint checked before it travels.",
   },
   {
-    src: "designerCaps",
-    label: "220-grit finish",
+    src: "stain",
+    label: "220-grit & seal",
     copy:
-      "Sanded to 220, edges eased by hand, painted or sealed, then capped with solar lighting and hardware.",
+      "Sanded to 220, edges eased by hand, then stained and sealed with a semi-transparent finish.",
   },
 ];
 
 export const GALLERY = [
   { src: "rowThreePosts", title: "Designer row, three finishes", meta: "Designer Series · black, barn red, white", span: "lg:col-span-7 lg:row-span-2" },
   { src: "carDisplay", title: "Mustang display build", meta: "Signature Series · themed commercial", span: "lg:col-span-5" },
-  { src: "designerCaps", title: "Solar caps & carved finials", meta: "Finish detail · hardware", span: "lg:col-span-5" },
-  { src: "shouBridge", title: "Charred timber, ready to build", meta: "Signature Series · Shou Sugi Ban", span: "lg:col-span-6" },
-  { src: "driveway", title: "On the stands, mid-build", meta: "The driveway shop", span: "lg:col-span-6" },
+  { src: "charredFrame", title: "Charred timber arbour frame", meta: "Signature Series · Shou Sugi Ban", span: "lg:col-span-5" },
+  { src: "designerCaps", title: "Solar caps & carved finials", meta: "Finish detail · hardware", span: "lg:col-span-4" },
+  { src: "boxesPrep", title: "Boxes prepped & flagged", meta: "Bench prep · every install", span: "lg:col-span-4" },
+  { src: "driveway", title: "On the stands, mid-build", meta: "The driveway shop", span: "lg:col-span-4" },
 ];
 
 export const SERVICES = [

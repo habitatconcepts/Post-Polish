@@ -52,12 +52,12 @@ export const HandCrafted = () => {
 
             <figure className="mt-14 overflow-hidden border border-slate950/12">
               <img
-                src={SHOTS.designerCaps}
-                alt="Close-up of three finished posts with carved finials and black solar caps"
+                src={SHOTS.tools}
+                alt="The full tool tray: sanders, drills, clamps, square, tape, glue, stain and sorted fasteners"
                 className="aspect-[4/3] w-full object-cover"
               />
               <figcaption className="bg-bone px-6 py-4 text-[11px] uppercase tracking-[0.18em] text-slate950/45">
-                Carved finials, solar caps, hand-painted finishes
+                Tools of the trade — laid out before the first cut
               </figcaption>
             </figure>
           </div>

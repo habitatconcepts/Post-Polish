@@ -1,0 +1,28 @@
+{
+  "summary": "Iteration 8 (proof-slider rebuild + 5 new real photos + nav shuffle) fully green. Backend: 20/20 pytest pass (leads CRUD, admin auth, bcrypt $2b$, httpOnly + Secure + SameSite=None cookies, CORS allowlist, brute-force lockout at 6th attempt, counter reset on success). Frontend: proof-section renders with headline 'The same timber, forty hours apart.' and overline 'Raw to finished'; both proof images load (naturalWidth=1500) and are served from customer-assets-jai6qajn.emergentagent.net; setting data-testid=before-after-range to 0/25/50/100 updates the overlay div's inline clip-path to inset(0px 0px 0px {val}%); proof-label-before='Raw stock' and proof-label-after='Charred & assembled' both visible. Nav has exactly 7 links (Services, Pricing, Gallery, Signature, Proof, Process, FAQ) — every href resolves to an existing section id, #craft anchor still present (intentional). No wrapping and no logo overlap at 1280/1440/1600/1920 widths. Every rendered <img> on the landing page comes from customer-assets-jai6qajn.emergentagent.net (0 from static.prod-images). Section-by-section imagery matches spec: hero=IMG_8268 rowThreePosts; manifesto sticky figure=IMG_7983 stain; FiveR's designerCaps=IMG_8261; gallery has 6 items 0..5 with the exact captions requested (Designer row, three finishes / Mustang display build / Charred timber arbour frame / Solar caps & carved finials / Boxes prepped & flagged / On the stands, mid-build); signature-showcase uses shouBridge (att.F0S) + carDisplay (IMG_8244); handcrafted-section renders tools tray (IMG_6237) with figcaption 'Tools of the trade — laid out before the first cut' + driveway (IMG_7992) parallax; process shots labelled 'Stock & cuts' / 'Bench assembly' / '220-grit & seal' with rawCuts, driveway, stain. Booking regression: empty submit shows error toast 'Name, contact, and property address are required.'; full submit -> booking-success + persisted lead visible in admin. Admin regression: /admin -> /admin/login unauth, login OK, TEST lead visible, Radix status combobox change -> 'Marked contacted' toast, refresh persists status='CONTACTED', logout returns to /admin/login. Zero JS console errors on the landing page. Mobile 390x844: no horizontal overflow. Cleanup performed post-run: 1 TEST_QA_ lead deleted, login_attempts collection cleared.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Hero (desktop >= 1280) — carry-over from iteration 7", "issues": ["Right-edge parallax figure column still extends up under the top nav bar. At 1920x1080 the SERVICES/PRICING/... links visually sit on top of the darker top edge of the figure photo. Links remain legible because that area of the image is dark, but the nav-book-btn (GET A QUOTE) still lands over the figure. Considered borderline, not a blocker."]},
+      {"screen": "Hero (mobile 390x844)", "issues": ["The three-post photo shows through behind the hero copy as a background — text is legible over the darker background overlay, but the mailboxes visually crowd/collide with the headline 'From broken box to polished welcome.' A stronger scrim (bg-slate950/70) over the mobile background image would improve readability."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py:318,337 still uses deprecated @app.on_event startup/shutdown — migrate to FastAPI lifespan handler (carried over from iter 6/7).",
+    "content.js formerly exported IMAGES with static.prod-images URLs; if it still exists it is now unused (BeforeAfter.js should be deleted). Confirm and remove dead exports/files.",
+    "Mobile hero background scrim opacity is too low — headline overlaps mailbox posts (design polish, non-blocking).",
+    "ProofSlider range input is opacity-0 stretched across the whole figure — works with mouse drag but the 12px thumb hit target may be awkward on touch; consider a visible thumb or hint."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "admin@postandpolish.com / Polish2026!",
+  "seed_data_creation": "1 TEST_QA_ lead created via UI booking then deleted; login_attempts cleared.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 10 real customer-asset photos are now wired via SHOTS in /app/frontend/src/data/content.js with unique keys (no aliases). ProofSlider uses a React-controlled range input — when writing playwright tests, use the native HTMLInputElement value setter + dispatchEvent('input') to trigger clip-path updates; setting el.value directly does NOT fire React's onChange. Radix Select for lead-status-* is a <button>, not a native <select>; click the trigger then click role=option. Backend suite stable at 20/20.",
+  "rca of the issue": "N/A — no bugs found this iteration."
+}

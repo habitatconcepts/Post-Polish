@@ -9,6 +9,7 @@ import { Packages } from "@/components/site/Packages";
 import { Gallery } from "@/components/site/Gallery";
 import { SignatureShowcase } from "@/components/site/SignatureShowcase";
 import { HandCrafted } from "@/components/site/HandCrafted";
+import { ProofSlider } from "@/components/site/ProofSlider";
 import { Ritual } from "@/components/site/Ritual";
 
 import { HowItWorks } from "@/components/site/HowItWorks";
@@ -52,6 +53,7 @@ export default function Landing() {
       <Gallery />
       <SignatureShowcase onSelect={pick} />
       <HandCrafted />
+      <ProofSlider />
       <Ritual />
       <HowItWorks onSelect={pick} />
       <FAQ />
