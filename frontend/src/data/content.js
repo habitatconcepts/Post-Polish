@@ -1,3 +1,88 @@
+const S = "https://static.prod-images.emergentagent.com/jobs/a4777f44-32ce-49d6-a498-88a190fbf0e0/images";
+
+// Photo slots — swap these URLs for the real job photos, keys stay the same.
+export const SHOTS = {
+  rowThreePosts: `${S}/363b17b3bcf9812caf40a81cc9cc755e2b9d831e07c3214a8c02dbe29e71923c.jpeg`,
+  shouBridge: `${S}/859ac970085b21e19ae860a217765a66e5fc0231a2dd96c6677e8fb19f37842a.jpeg`,
+  carDisplay: `${S}/c9f4bfe0656e39d379af13d7869f4c67efb7935833f7d48fe377dc244ed7c5b2.jpeg`,
+  driveway: `${S}/a5b757bbdb0055dd4280c0b4f06a334a402a24561613af6a9ed7587607798ebd.jpeg`,
+  tools: `${S}/4d6e806db259081ff277827de86b188bbf43e9d7a37280ee53df5173f5f859b2.jpeg`,
+  rawCuts: `${S}/d255a24e97f7c5196df8c2eb23415a85a872895a5962cb3ec7af3f5854ae0352.jpeg`,
+  hardware: `${S}/a722513a8adb6395c53ca70222fc05afd2e07428dfcea75c7e5258c604ab870c.jpeg`,
+  sanding: `${S}/0377b7c518ab223ef9ef1e865469312730441ab2444017ae5d5d5653a45078fa.jpeg`,
+  grain: `${S}/ad5a486fa8bffe81610b5dd110d78b002ff21a37dbc8b885612a225cbbe4ad7d.jpeg`,
+  blackPost: `${S}/b4dbbf7d99919f2fa08430b9f8a44ea64ca2776281dc47fa308868a7752d3cfa.jpeg`,
+};
+
+export const MANIFESTO = [
+  {
+    n: "01",
+    title: "The curb is the handshake",
+    copy:
+      "Before anyone sees your door, they see the post at the street. We treat that six-foot stretch of your property like the front of a building, not an afterthought.",
+  },
+  {
+    n: "02",
+    title: "Built in a driveway, on purpose",
+    copy:
+      "Every post is cut, fitted, and finished on sawhorses before it ever meets your yard. Bench-built means square joints, tight brackets, and no improvising in the dirt.",
+  },
+  {
+    n: "03",
+    title: "220 grit is the standard",
+    copy:
+      "Hand-sanded to 220, edges eased by hand, wiped clean, then sealed. You notice it with your hand before you notice it with your eyes.",
+  },
+  {
+    n: "04",
+    title: "Integrity, not upsell",
+    copy:
+      "If a reset will do, we say so. If the post is rotten, we say that too. One flat number, quoted before the shovel, honoured after.",
+  },
+];
+
+export const CRAFT_COPY = {
+  overline: "Hand-crafted",
+  title: "Driveway to curbside.",
+  lead:
+    "Post & Polish started the way most good trades do — sawhorses in an open driveway, a tray of tools laid out in order, and a refusal to hand over anything we wouldn't want at the end of our own walk.",
+  body:
+    "That hasn't changed. Every build is assembled and finished before it travels, so what arrives at your curb is complete: joints tight, hardware torqued, finish cured, edges eased. Integrity-driven builds means the parts you can't see are done to the same standard as the face of the post.",
+  points: [
+    "Bench-built on sawhorses, never improvised on site",
+    "Every tool laid out before the first cut",
+    "Hidden hardware finished like visible hardware",
+    "We haul away everything we take out",
+  ],
+};
+
+export const PROCESS_SHOTS = [
+  {
+    src: "rawCuts",
+    label: "Stock selection",
+    copy: "Timber picked by hand, cut square, laid out and marked before anything is fastened.",
+  },
+  {
+    src: "hardware",
+    label: "Hardware",
+    copy: "Matte black hex bolts, washers and powder-coated brackets — sorted, counted, torqued.",
+  },
+  {
+    src: "sanding",
+    label: "220-grit finish",
+    copy: "Sanded through the grits to 220, edges eased by hand, dust wiped clean before sealing.",
+  },
+];
+
+export const GALLERY = [
+  { src: "rowThreePosts", title: "Designer row, three finishes", meta: "Designer Series · red, white, black", span: "lg:col-span-7 lg:row-span-2" },
+  { src: "carDisplay", title: "Muscle car display post", meta: "Signature Series · themed build", span: "lg:col-span-5" },
+  { src: "grain", title: "Eased edge, hand-rubbed grain", meta: "Finish detail · 220 grit", span: "lg:col-span-5" },
+  { src: "blackPost", title: "Matte black with solar cap", meta: "Designer Series · dusk install", span: "lg:col-span-4" },
+  { src: "shouBridge", title: "Charred heritage bridge", meta: "Signature Series · Shou Sugi Ban", span: "lg:col-span-4" },
+  { src: "tools", title: "Tools of the trade", meta: "Bench setup · every job", span: "lg:col-span-4" },
+];
+
 export const IMAGES = {
   hero: "https://static.prod-images.emergentagent.com/jobs/a4777f44-32ce-49d6-a498-88a190fbf0e0/images/49989f1574be154ebdd34dbf529d4fbb074fe533cf41c0396de6b212289d3843.jpeg",
   before:

@@ -50,6 +50,23 @@ clear flat-rate tiers and low-friction booking.
   Raster only — an SVG rebuild is still open if large-format print is needed.- AI-generated placeholder hero and before/after photography.
 - Tested: iteration_4 green — 20/20 backend, all requested frontend flows.
 
+## Implemented (2026-09 — visual overhaul)
+- Vector logo: `LogoMark.js` hand-authored SVG (eggshell plate + burnt patina, maroon embossed serif
+  wordmark, navy hand-painted brush pull, wood-grain post with Fire Pit brown cap) used in nav + footer;
+  raster PNG retained for favicon/apple-touch-icon.
+- Kinetic hero: full-bleed photography with framer-motion scroll parallax, masked line-by-line
+  headline reveal, staggered pain-points, scroll cue.
+- New sections: **Manifesto** (4 numbered chapters), **Gallery — "Our latest transformations"**
+  (6-item editorial grid), **Signature Showcase** (Shou Sugi Ban heritage bridge + themed muscle-car
+  display, dual parallax, spotlight treatment), **Hand-Crafted** ("Driveway to curbside" — driveway
+  workshop + tools-of-the-trade, integrity-driven-builds copy), **Process** photo cards
+  (stock selection / hardware / 220-grit finish). Slow editorial marquee replaces the trust ribbon.
+- Lenis momentum scrolling; framer-motion reveals and micro-interactions throughout.
+- All photography is AI-generated stand-in in named `SHOTS` slots — real photos never arrived.
+- Lead alert emails: Resend + FastAPI BackgroundTasks (`send_lead_alert`), safe no-op until
+  `RESEND_API_KEY` + `LEAD_ALERT_EMAIL` are set.
+- Tested: iteration_6 green — 20/20 backend, all new sections, 0 broken images, 0 console errors.
+
 ## Backlog
 ### P0
 - Replace placeholder before/after photos with real job photos (gallery of multiple jobs).
@@ -65,7 +82,10 @@ clear flat-rate tiers and low-friction booking.
 - SEO: local business schema, per-service landing pages.
 
 ## Next tasks
-1. Pick a logo concept and wire it into nav, footer, and favicon.
-2. Swap placeholder photography for real job photos (Designer Series + Shou Sugi Ban builds).
-3. Wire new-lead email notifications to the owner.
-4. Add booking-form photo upload.
+1. **Blocked — awaiting user upload**: swap real project photos into the named `SHOTS` slots in
+   `/app/frontend/src/data/content.js` (rowThreePosts, shouBridge, carDisplay, driveway, tools,
+   rawCuts, hardware, sanding, grain, blackPost). All current photography is AI-generated stand-in.
+2. **Blocked — awaiting user key**: lead alert emails. Code path is live via Resend + BackgroundTasks
+   but no-ops until `RESEND_API_KEY` and `LEAD_ALERT_EMAIL` are set in `/app/backend/.env`.
+3. Swap the before/after slider images for a real single-property before and after.
+4. Add booking-form photo upload (object storage) for photo-based quoting.

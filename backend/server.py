@@ -5,14 +5,16 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 import os
+import asyncio
 import logging
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional, Annotated
 
 import bcrypt
 import jwt
+import resend
 from bson import ObjectId
-from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends, BackgroundTasks
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr, Field
@@ -204,12 +206,63 @@ async def logout(response: Response):
     return {"ok": True}
 
 
+async def send_lead_alert(lead: "Lead") -> None:
+    api_key = os.environ.get("RESEND_API_KEY", "").strip()
+    recipient = os.environ.get("LEAD_ALERT_EMAIL", "").strip()
+    if not api_key or not recipient:
+        logger.info("Lead alert skipped — RESEND_API_KEY or LEAD_ALERT_EMAIL not configured")
+        return
+
+    resend.api_key = api_key
+    rows = [
+        ("Name", lead.name),
+        ("Contact", lead.contact),
+        ("Address", lead.address),
+        ("Service", lead.service),
+        ("Notes", lead.notes or "—"),
+    ]
+    body = "".join(
+        f'<tr><td style="padding:8px 16px 8px 0;font:600 12px Helvetica,Arial;'
+        f'text-transform:uppercase;letter-spacing:1.5px;color:#8a8a8a;vertical-align:top">{k}</td>'
+        f'<td style="padding:8px 0;font:400 15px Georgia,serif;color:#0C1627">{v}</td></tr>'
+        for k, v in rows
+    )
+    html = (
+        '<div style="background:#F6F5F2;padding:32px">'
+        '<table role="presentation" style="max-width:560px;margin:0 auto;background:#fff;'
+        'border:1px solid #EAE7E0;border-collapse:collapse">'
+        '<tr><td style="background:#0C1627;padding:24px 28px">'
+        '<div style="font:400 22px Georgia,serif;color:#F6F5F2">NE Post &amp; Polish</div>'
+        '<div style="font:700 11px Helvetica,Arial;letter-spacing:2px;color:#C5A059;'
+        'text-transform:uppercase;margin-top:6px">New quote request</div>'
+        "</td></tr>"
+        '<tr><td style="padding:28px"><table role="presentation" style="border-collapse:collapse">'
+        f"{body}</table></td></tr>"
+        '<tr><td style="padding:0 28px 28px;font:400 12px Helvetica,Arial;color:#8a8a8a">'
+        "Open the lead dashboard to set a status and follow up.</td></tr>"
+        "</table></div>"
+    )
+
+    params = {
+        "from": os.environ["SENDER_EMAIL"],
+        "to": [recipient],
+        "subject": f"New lead — {lead.name} ({lead.service})",
+        "html": html,
+    }
+    try:
+        sent = await asyncio.to_thread(resend.Emails.send, params)
+        logger.info("Lead alert sent: %s", sent.get("id"))
+    except Exception as exc:
+        logger.error("Lead alert failed: %s", exc)
+
+
 @api_router.post("/leads", response_model=Lead, response_model_by_alias=False, status_code=201)
-async def create_lead(payload: LeadCreate):
+async def create_lead(payload: LeadCreate, background_tasks: BackgroundTasks):
     lead = Lead(**payload.model_dump())
     result = await db.leads.insert_one(lead.to_mongo())
     lead.id = str(result.inserted_id)
     logger.info("New lead captured: %s / %s", lead.name, lead.service)
+    background_tasks.add_task(send_lead_alert, lead)
     return lead
 
 

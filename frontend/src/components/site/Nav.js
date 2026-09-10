@@ -5,8 +5,9 @@ import { Logo } from "@/components/site/Logo";
 const LINKS = [
   { label: "Services", href: "#services" },
   { label: "Pricing", href: "#pricing" },
-  { label: "Proof", href: "#proof" },
-  { label: "Ritual", href: "#ritual" },
+  { label: "Gallery", href: "#gallery" },
+  { label: "Signature", href: "#signature" },
+  { label: "Craft", href: "#craft" },
   { label: "Process", href: "#process" },
   { label: "FAQ", href: "#faq" },
 ];
@@ -43,7 +44,7 @@ export const Nav = () => {
           />
         </a>
 
-        <nav className="hidden items-center gap-10 md:flex">
+        <nav className="hidden items-center gap-7 md:flex">
           {LINKS.map((l) => (
             <a
               key={l.href}

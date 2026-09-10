@@ -3,8 +3,12 @@ import Lenis from "lenis";
 import { Nav } from "@/components/site/Nav";
 import { Hero } from "@/components/site/Hero";
 import { TrustRibbon } from "@/components/site/TrustRibbon";
+import { Manifesto } from "@/components/site/Manifesto";
 import { FiveRs } from "@/components/site/FiveRs";
 import { Packages } from "@/components/site/Packages";
+import { Gallery } from "@/components/site/Gallery";
+import { SignatureShowcase } from "@/components/site/SignatureShowcase";
+import { HandCrafted } from "@/components/site/HandCrafted";
 import { BeforeAfter } from "@/components/site/BeforeAfter";
 import { Ritual } from "@/components/site/Ritual";
 import { HowItWorks } from "@/components/site/HowItWorks";
@@ -18,7 +22,7 @@ export default function Landing() {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const lenis = new Lenis({ duration: 1.05, smoothWheel: true });
+    const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     let id;
     const raf = (t) => {
       lenis.raf(t);
@@ -42,8 +46,12 @@ export default function Landing() {
       <Nav />
       <Hero />
       <TrustRibbon />
+      <Manifesto />
       <FiveRs />
       <Packages onSelect={pick} />
+      <Gallery />
+      <SignatureShowcase onSelect={pick} />
+      <HandCrafted />
       <BeforeAfter />
       <Ritual />
       <HowItWorks onSelect={pick} />

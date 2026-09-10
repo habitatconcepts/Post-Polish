@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import * as Icons from "lucide-react";
-import { SERVICES, IMAGES } from "@/data/content";
+import { SERVICES, SHOTS } from "@/data/content";
 
 const SPANS = [
   "md:col-span-7 md:row-span-2",
@@ -48,7 +48,7 @@ export const FiveRs = () => (
             >
               {isFirst && (
                 <img
-                  src={IMAGES.upgraded}
+                  src={SHOTS.blackPost}
                   alt=""
                   className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25 transition-transform duration-[1200ms] group-hover:scale-105"
                 />
