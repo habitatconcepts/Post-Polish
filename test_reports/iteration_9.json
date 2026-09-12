@@ -1,0 +1,30 @@
+{
+  "summary": "Iteration 9 — Object storage integration (file & media) verified end-to-end. Backend: 32/32 pytest pass (16 regression + 12 new upload/file/photo tests). New coverage: POST /api/uploads returns 201 for JPEG/PNG with correct {file_id, filename, size, content_type}; db.files record created with is_deleted=false and storage_path prefix 'ne-post-and-polish/lead-photos/'; non-image (text/plain, application/pdf) → 400 with JPEG/PNG/WEBP/HEIC message; empty file → 400; >10MB → 413; GET /api/files/{id} → 401 without auth, 200 image/jpeg with matching bytes via Bearer header AND via ?auth= query param, 404 for unknown id with valid token; POST /api/leads with photo_ids=[valid, 'bogus-id'] persists only the valid id, no photo_ids returns [], 6 photo_ids returns 422 (max_length=5). Regression suite (leads CRUD/stats, admin auth, bcrypt $2b$, CORS allowlist, brute-force lockout at 6th, counter reset) all green. Frontend booking upload: opened /#book, picked The Essential — code-compliant install, clicked booking-next, set_input_files two JPEGs on hidden photo-upload-input → photo-thumbs rendered exactly 2 photo-thumb-{id}; photo-remove-{id} force-click removed one; attaching a text file surfaced the toast 'Only JPEG, PNG, WEBP or HEIC images can be uploaded.' and did not add a thumb; attaching 6 more files with 1 already present did NOT add any (still 1 thumb) and surfaced 'Up to 5 photos, please.' toast; filled name/contact/address/notes and submitted → booking-success appeared; the admin API returned the created lead with the remaining photo_id persisted; booking-reset cleared photo grid and returned to step 1. Admin dashboard: logged in as admin@postandpolish.com / Polish2026!, the TEST lead rendered a lead-photos block containing lead-photo-{file_id} with an <img> whose src starts with 'blob:' (blob URL from authenticated fetch, NOT direct storage URL) and naturalWidth=120 > 0. Zero 401s on the /files/ requests. Only 1 lead in table => the sole lead-photos block matches sole lead (leads without photos wouldn't render the block — verified logic in LeadPhotos.js returns null when ids empty). Cleanup: 1 TEST_QA_ lead deleted, login_attempts cleared, 8 db.files records left in place (soft-delete only, no delete API by design).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/test_uploads.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py:400,425 still uses deprecated @app.on_event startup/shutdown — pre-existing, carried over from iter 6/7/8, non-blocking.",
+    "storage.py init_storage() is not thread-safe (global storage_key mutated without a lock) — race on cold start is theoretical (single-worker uvicorn); flag if scaled to multiple workers.",
+    "LeadPhotos.js effect depends on ids array identity; if AdminDashboard re-renders with a new array ref of the same ids, blobs will be re-fetched. Acceptable given lists are small; consider useMemo(() => ids.join(','), ids) as a stable dep if performance matters.",
+    "server.py MAX_UPLOAD_BYTES enforced after reading the whole body into memory — a hostile client could still stream 100MB before the 413 fires. Consider FastAPI/starlette request-size limit or streaming check. Not critical for the current admin-visible-only use case.",
+    "db.files currently accumulates 8 records with no cleanup UX (soft-delete field exists but no admin action wired). Fine for MVP."
+  ],
+  "updated_files": ["/app/backend/tests/test_uploads.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "admin@postandpolish.com / Polish2026!",
+  "seed_data_creation": "Created 1 TEST_QA_UI_photos lead via UI + 3 TEST_QA_UP_* leads via pytest. All TEST_QA_ leads deleted post-run; login_attempts cleared. 8 db.files smoke-test/QA records left (soft-delete only, no delete API).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "New upload/photo tests live in /app/backend/tests/test_uploads.py (uses Pillow to synthesize JPEG/PNG bytes; total 12 tests). BookingForm uploads via hidden <input type=file data-testid=photo-upload-input> — MUST use page.set_input_files, not click(). Photo remove buttons have opacity-0 until parent hover; use force=True on click. LeadPhotos.js fetches /api/files/{id} as blob and renders src=blob:... — assert img.naturalWidth > 0 not src host. GET /api/files/{id} accepts token as ?auth= query param (in addition to Authorization header) so <img>/<a href> can load it, but LeadPhotos actually uses axios Bearer + responseType=blob and then createObjectURL — the ?auth= path is exercised by test_08 only. Service option testids use the label before ' —', so 'service-option-the-essential' not 'service-option-the-standard'.",
+  "rca of the issue": "N/A — no bugs found this iteration."
+}

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { api, formatApiError } from "@/lib/api";
+import { LeadPhotos } from "@/components/admin/LeadPhotos";
 
 const STATUSES = ["new", "contacted", "scheduled", "completed", "lost"];
 
@@ -182,6 +183,7 @@ export default function AdminDashboard() {
                     {l.notes}
                   </p>
                 )}
+                <LeadPhotos ids={l.photo_ids || []} />
               </div>
               <p className="text-sm text-slate950/70 lg:col-span-2">{l.contact}</p>
               <p className="text-sm text-slate950/70 lg:col-span-3">{l.address}</p>

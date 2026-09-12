@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ImagePlus, Loader2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -9,10 +9,12 @@ import { SERVICE_OPTIONS } from "@/data/content";
 
 const PERKS = [
   "Firm, all-inclusive price before we schedule",
-  "No estimator visit needed — describe it and we quote",
+  "No estimator visit needed — send a photo and we quote",
   "Old unit removed and hauled away",
   "Clean site when we leave, every time",
 ];
+
+const MAX_PHOTOS = 5;
 
 const inputCls =
   "h-14 rounded-none border-0 border-b border-bone/25 bg-transparent px-0 text-bone placeholder:text-bone/35 focus-visible:ring-0 focus-visible:border-brass";
@@ -27,8 +29,41 @@ export const BookingForm = ({ service, setService }) => {
   });
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [photos, setPhotos] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const addPhotos = async (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = "";
+    if (!files.length) return;
+    if (photos.length + files.length > MAX_PHOTOS) {
+      toast.error(`Up to ${MAX_PHOTOS} photos, please.`);
+      return;
+    }
+    setUploading(true);
+    for (const file of files) {
+      const body = new FormData();
+      body.append("file", file);
+      try {
+        const { data } = await api.post("/uploads", body);
+        setPhotos((p) => [
+          ...p,
+          { id: data.file_id, name: data.filename, preview: URL.createObjectURL(file) },
+        ]);
+      } catch (err) {
+        toast.error(
+          formatApiError(err.response?.data?.detail) ||
+            `Could not upload ${file.name}`
+        );
+      }
+    }
+    setUploading(false);
+  };
+
+  const removePhoto = (id) =>
+    setPhotos((p) => p.filter((x) => x.id !== id));
 
   const submit = async (e) => {
     e.preventDefault();
@@ -44,6 +79,7 @@ export const BookingForm = ({ service, setService }) => {
         address: form.address.trim(),
         service,
         notes: form.notes.trim() || null,
+        photo_ids: photos.map((p) => p.id),
       });
       setDone(true);
       toast.success("Request received — we'll confirm your flat rate shortly.");
@@ -101,6 +137,7 @@ export const BookingForm = ({ service, setService }) => {
                   onClick={() => {
                     setDone(false);
                     setStep(1);
+                    setPhotos([]);
                     setForm({ name: "", contact: "", address: "", notes: "" });
                   }}
                   className="mt-9 border border-brass px-7 py-3.5 text-xs font-bold uppercase tracking-[0.18em] text-brass transition-colors duration-300 hover:bg-brass hover:text-slate950"
@@ -222,6 +259,70 @@ export const BookingForm = ({ service, setService }) => {
                           className="mt-2 resize-none rounded-none border border-bone/20 bg-transparent text-bone placeholder:text-bone/35 focus-visible:border-brass focus-visible:ring-0"
                         />
                       </div>
+                    </div>
+
+                    <div className="mt-9 border border-bone/15 p-6">
+                      <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                          <p className="text-[11px] uppercase tracking-[0.18em] text-bone/50">
+                            Photos (optional)
+                          </p>
+                          <p className="mt-2 max-w-sm text-xs leading-relaxed text-bone/45">
+                            Snap your current mailbox and we'll quote from the
+                            picture — no estimator visit. Up to {MAX_PHOTOS}{" "}
+                            images, 10 MB each.
+                          </p>
+                        </div>
+                        <label
+                          data-testid="photo-upload-label"
+                          className="inline-flex cursor-pointer items-center gap-3 border border-brass px-6 py-3 text-[11px] font-bold uppercase tracking-[0.18em] text-brass transition-colors duration-300 hover:bg-brass hover:text-slate950"
+                        >
+                          {uploading ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <ImagePlus size={14} />
+                          )}
+                          {uploading ? "Uploading" : "Add photos"}
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                            multiple
+                            data-testid="photo-upload-input"
+                            onChange={addPhotos}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+
+                      {photos.length > 0 && (
+                        <div
+                          data-testid="photo-thumbs"
+                          className="mt-6 flex flex-wrap gap-4"
+                        >
+                          {photos.map((p) => (
+                            <div
+                              key={p.id}
+                              data-testid={`photo-thumb-${p.id}`}
+                              className="group relative h-20 w-20 overflow-hidden border border-bone/20"
+                            >
+                              <img
+                                src={p.preview}
+                                alt={p.name}
+                                className="h-full w-full object-cover"
+                              />
+                              <button
+                                type="button"
+                                data-testid={`photo-remove-${p.id}`}
+                                onClick={() => removePhoto(p.id)}
+                                aria-label={`Remove ${p.name}`}
+                                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center bg-slate950/80 text-bone opacity-0 transition-opacity group-hover:opacity-100"
+                              >
+                                <X size={11} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-10 flex flex-wrap items-center gap-4">

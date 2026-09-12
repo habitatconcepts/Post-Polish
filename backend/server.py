@@ -7,6 +7,7 @@ load_dotenv(ROOT_DIR / '.env')
 import os
 import asyncio
 import logging
+import uuid
 from datetime import datetime, timezone, timedelta
 from typing import List, Optional, Annotated
 
@@ -14,16 +15,29 @@ import bcrypt
 import jwt
 import resend
 from bson import ObjectId
-from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends, BackgroundTasks
+from fastapi import (FastAPI, APIRouter, HTTPException, Request, Response, Depends,
+                     BackgroundTasks, UploadFile, File, Query, Header)
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, BeforeValidator, ConfigDict, EmailStr, Field
+
+from storage import APP_NAME, init_storage, put_object, get_object
 
 client = AsyncIOMotorClient(os.environ['MONGO_URL'])
 db = client[os.environ['DB_NAME']]
 
 JWT_ALGORITHM = "HS256"
 LEAD_STATUSES = ["new", "contacted", "scheduled", "completed", "lost"]
+
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/heic": "heic",
+    "image/heif": "heif",
+}
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
+MAX_PHOTOS_PER_LEAD = 5
 
 app = FastAPI(title="Post & Polish API")
 api_router = APIRouter(prefix="/api")
@@ -61,6 +75,7 @@ class Lead(BaseDocument):
     address: str
     service: str
     notes: Optional[str] = None
+    photo_ids: List[str] = Field(default_factory=list)
     status: str = "new"
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -73,6 +88,14 @@ class LeadCreate(BaseModel):
     address: str = Field(min_length=3, max_length=240)
     service: str = Field(min_length=1, max_length=120)
     notes: Optional[str] = Field(default=None, max_length=2000)
+    photo_ids: List[str] = Field(default_factory=list, max_length=MAX_PHOTOS_PER_LEAD)
+
+
+class UploadOut(BaseModel):
+    file_id: str
+    filename: str
+    size: int
+    content_type: str
 
 
 class LeadStatusUpdate(BaseModel):
@@ -116,8 +139,8 @@ def create_refresh_token(user_id: str) -> str:
     return jwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
 
 
-async def get_current_admin(request: Request) -> AdminOut:
-    token = request.cookies.get("access_token")
+async def get_current_admin(request: Request, token_override: Optional[str] = None) -> AdminOut:
+    token = token_override or request.cookies.get("access_token")
     if not token:
         auth_header = request.headers.get("Authorization", "")
         if auth_header.startswith("Bearer "):
@@ -220,6 +243,7 @@ async def send_lead_alert(lead: "Lead") -> None:
         ("Address", lead.address),
         ("Service", lead.service),
         ("Notes", lead.notes or "—"),
+        ("Photos", f"{len(lead.photo_ids)} attached" if lead.photo_ids else "none"),
     ]
     body = "".join(
         f'<tr><td style="padding:8px 16px 8px 0;font:600 12px Helvetica,Arial;'
@@ -256,12 +280,70 @@ async def send_lead_alert(lead: "Lead") -> None:
         logger.error("Lead alert failed: %s", exc)
 
 
+@api_router.post("/uploads", response_model=UploadOut, status_code=201)
+async def upload_photo(file: UploadFile = File(...)):
+    content_type = (file.content_type or "").lower()
+    if content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=400,
+                            detail="Only JPEG, PNG, WEBP or HEIC images can be uploaded.")
+    data = await file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="The uploaded file is empty.")
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="Each photo must be 10 MB or smaller.")
+
+    ext = ALLOWED_IMAGE_TYPES[content_type]
+    file_id = str(uuid.uuid4())
+    path = f"{APP_NAME}/lead-photos/{file_id}.{ext}"
+    try:
+        result = await asyncio.to_thread(put_object, path, data, content_type)
+    except Exception as exc:
+        logger.error("Photo upload failed: %s", exc)
+        raise HTTPException(status_code=502, detail="Photo upload failed. Please try again.")
+
+    await db.files.insert_one({
+        "file_id": file_id,
+        "storage_path": result["path"],
+        "original_filename": file.filename or f"{file_id}.{ext}",
+        "content_type": content_type,
+        "size": result.get("size", len(data)),
+        "is_deleted": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return UploadOut(file_id=file_id, filename=file.filename or f"{file_id}.{ext}",
+                     size=result.get("size", len(data)), content_type=content_type)
+
+
+@api_router.get("/files/{file_id}")
+async def download_file(file_id: str, request: Request, auth: Optional[str] = Query(default=None)):
+    await get_current_admin(request, token_override=auth)
+
+    record = await db.files.find_one({"file_id": file_id, "is_deleted": False})
+    if not record:
+        raise HTTPException(status_code=404, detail="File not found")
+    try:
+        data, content_type = await asyncio.to_thread(get_object, record["storage_path"])
+    except Exception as exc:
+        logger.error("Photo fetch failed for %s: %s", file_id, exc)
+        raise HTTPException(status_code=502, detail="Could not load the photo.")
+    return Response(content=data, media_type=record.get("content_type", content_type),
+                    headers={"Cache-Control": "private, max-age=3600"})
+
+
 @api_router.post("/leads", response_model=Lead, response_model_by_alias=False, status_code=201)
 async def create_lead(payload: LeadCreate, background_tasks: BackgroundTasks):
-    lead = Lead(**payload.model_dump())
+    data = payload.model_dump()
+    photo_ids = data.get("photo_ids") or []
+    if photo_ids:
+        found = await db.files.find(
+            {"file_id": {"$in": photo_ids}, "is_deleted": False}, {"file_id": 1}
+        ).to_list(MAX_PHOTOS_PER_LEAD)
+        data["photo_ids"] = [f["file_id"] for f in found]
+    lead = Lead(**data)
     result = await db.leads.insert_one(lead.to_mongo())
     lead.id = str(result.inserted_id)
-    logger.info("New lead captured: %s / %s", lead.name, lead.service)
+    logger.info("New lead captured: %s / %s (%d photos)", lead.name, lead.service,
+                len(lead.photo_ids))
     background_tasks.add_task(send_lead_alert, lead)
     return lead
 
@@ -320,6 +402,12 @@ async def startup():
     await db.users.create_index("email", unique=True)
     await db.leads.create_index("created_at")
     await db.login_attempts.create_index("identifier", unique=True)
+    await db.files.create_index("file_id", unique=True)
+    try:
+        init_storage()
+        logger.info("Object storage initialized")
+    except Exception as exc:
+        logger.error("Storage init failed: %s", exc)
     admin_email = os.environ["ADMIN_EMAIL"].lower()
     admin_password = os.environ["ADMIN_PASSWORD"]
     existing = await db.users.find_one({"email": admin_email})
